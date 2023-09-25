@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:property-placeholder location="classpath:fromMount.properties"/> <!-- Отсылает к файлу, откуда можно взят значение переменных -->
+
+        <!--1)  ID - Имя, по которому можно обращаться к созданному объекту. -->
+    <!-- 2) CLASS - Класс объекта, который мы создаем. -->
+    <!-- 3) SCOPE - Определяет какое количество объектов такого типа будет создано, по дефолту scope = singleton,
+    При создании еще одного такого объекта, даст ссылку на уже созданный ПРИ ЛЮБЫХ ОБСТОЯТЕЛЬСТВАХ, даже при private конструкторе.
+    Может меняться на prototype, тогда при вызове еще одного такого объекта, создаст новый объект с новой ссылкой. -->
+    <!-- 4) INIT-METHOD - Инит метод, с которого начинается деятельность bean'а, после его создание и установления зависимостей. -->
+    <!-- 5) DESTROY-METHOD - Уничтожает данный bean после своей деятельности, если scope = singleton, если prototype - не сработает. -->
+    <!-- 6) FACTORY-METHOD - При создании объекта указывает как создать объект и всегда подобным образом его создает, по дефолту через new.-->
+    <bean id="forTB"
+          class="springExamples.ForTestBeans"
+          scope="singleton"
+          init-method="initMeth"
+          destroy-method="destroyMeth"> <!-- factory-method -->
+        <property name="nickname" value="Rubick"/>
+    </bean>
+
+    <bean id="firstBean"
+          class="springExamples.TestBeans"
+          scope="prototype"
+          >
+        <constructor-arg ref="forTB"/>                    <!--Конструктор-->
+    </bean>
+    <!-- ====================================================================================================================== -->
+    <bean id="skis"
+          class="springExamples.fromTheMount.Skis">
+    </bean>
+
+    <bean id="snowboard"
+          class="springExamples.fromTheMount.Snowboard">
+    </bean>
+
+    <bean id="skates"
+          class="springExamples.fromTheMount.Skates">
+    </bean>
+
+    <bean id="inventory"
+          class="java.util.ArrayList">
+        <constructor-arg>
+            <list>
+                <ref bean="skis"/>
+                <ref bean="snowboard"/>
+                <ref bean="skates"/>
+            </list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="mount"
+          class="springExamples.fromTheMount.FromMount">
+        <constructor-arg ref="inventory" />
+        <property name="name" value="Альпы"/>              <!--По сути, это инициализация полей. Она производится с помощью Сеттера-->
+        <property name="high" value="${fromMount.high}"/>  <!--Такая же инициализация, только примитивной переменной и с помощью файла ".properties" ${} - из файла-->
+<!--      <property name="inventories">
+        <list>
+            <ref bean="skis"/>
+            <ref bean="snowboard"/>
+            <ref bean="skates"/>
+        </list>
+        </property>-->
+    </bean>
+
+</beans>
